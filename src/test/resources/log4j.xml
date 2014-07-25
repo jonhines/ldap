@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE log4j:configuration SYSTEM "log4j.dtd">
+
+<log4j:configuration xmlns:log4j="http://jakarta.apache.org/log4j/">
+	<appender name="console" class="org.apache.log4j.ConsoleAppender">
+		<param name="Target" value="System.out" />
+		<layout class="org.apache.log4j.PatternLayout">
+			<param name="ConversionPattern" value="%d [%t] %-5p (%F:%L) - %m%n" />
+		</layout>
+	</appender>
+
+	<category name="org.springframework.ws.client.MessageTracing">
+		<!-- set to trace level to see outgoing webservice request and response 
+			messages.  Note: will not show non-xml responses -->
+		<priority value="trace" />
+	</category>
+	
+	<category
+		name="httpclient.wire">
+		<!-- set to debug level to see raw outgoing http requests/responses -->
+		<priority value="warn" />
+	</category>
+
+	<category
+		name="org.springframework.ws.transport.http.MessageDispatcherServlet">
+		<!-- set to debug level for help troubleshooting spring webservices -->
+		<priority value="warn" />
+	</category>
+
+	<category
+		name="org.springframework.ws.server.endpoint.interceptor.PayloadLoggingInterceptor">
+		<!-- set to trace level to see incoming request and response messages -->
+		<priority value="warn" />
+	</category>
+
+	<category
+		name="org.springframework.security">
+		<!-- set to debug level to help troubleshoot spring security -->
+		<priority value="warn"/>
+	</category>
+
+	<category
+		name="org.hibernate.tool.hbm2ddl">
+		<!-- set to debug level to see hibernate auto DDL sql statements -->
+		<priority value="debug" />
+	</category>
+
+	<category
+		name="org.hibernate.SQL">
+		<!-- set to debug level to see hibernate sql -->
+		<priority value="debug" />
+	</category>
+
+	<category
+		name="org.hibernate.type">
+		<!-- set to trace level to Log all hibernate JDBC parameters -->
+		<priority value="warn" />
+	</category>
+	
+	<category name="org.hibernate.cache">
+		<priority value="debug" />
+	</category>
+	
+
+	<root>
+		<priority value="WARN" />
+		<appender-ref ref="console" />
+	</root>
+
+</log4j:configuration>
