@@ -7,7 +7,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import com.ldap.model.SystemCredentials;
+import com.ldap.dto.UserDTO;
 
 /**
  * Customized Spring UserDetails implementation.
@@ -21,29 +21,23 @@ public class APIUser implements UserDetails
 
     private static final String ROLE_API_APPLICATION_USER = "ROLE_API_APPLICATION_USER";
 
-    private String token;
+    private String userName;
+    private String firstName;
+    private String lastName;
 
     public APIUser()
     {
         // do nothing
     }
-    
-    public APIUser(SystemCredentials systemCredentials)
+
+    public APIUser(UserDTO userDTO)
     {
-        if(systemCredentials != null)
+        if (userDTO != null)
         {
-            setToken(systemCredentials.getUserToken());
+            setUserName(userDTO.getUserName());
+            setFirstName(userDTO.getFirstName());
+            setLastName(userDTO.getLastName());
         }
-    }
-
-    public String getToken()
-    {
-        return token;
-    }
-
-    public void setToken(String token)
-    {
-        this.token = token;
     }
 
     @Override
@@ -63,7 +57,12 @@ public class APIUser implements UserDetails
     @Override
     public String getUsername()
     {
-        return null;
+        return userName;
+    }
+
+    public void setUserName(String userName)
+    {
+        this.userName = userName;
     }
 
     @Override
@@ -88,5 +87,25 @@ public class APIUser implements UserDetails
     public boolean isEnabled()
     {
         return true;
+    }
+
+    public String getFirstName()
+    {
+        return firstName;
+    }
+
+    public void setFirstName(String firstName)
+    {
+        this.firstName = firstName;
+    }
+
+    public String getLastName()
+    {
+        return lastName;
+    }
+
+    public void setLastName(String lastName)
+    {
+        this.lastName = lastName;
     }
 }

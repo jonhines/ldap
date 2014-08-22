@@ -1,6 +1,10 @@
 package com.ldap.security;
-import static org.apache.commons.lang3.StringUtils.isBlank;
 
+import static org.apache.commons.lang.StringUtils.isBlank;
+
+import org.apache.commons.codec.binary.Base64;
+import org.apache.directory.api.ldap.model.constants.LdapSecurityConstants;
+import org.apache.directory.api.ldap.model.password.PasswordUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -8,26 +12,25 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 
-import com.ldap.model.SystemCredentials;
-import com.ldap.model.dao.SystemCredentialsDAO;
+import com.ldap.dto.UserDTO;
+import com.ldap.model.dao.LDAPUserDAO;
 
 /**
  * @author jon
  */
 public class LDAPAuthenticationProvider implements AuthenticationProvider
 {
-
     @Autowired
-    private SystemCredentialsDAO systemCredentialsDAO;
-    
+    private LDAPUserDAO ldapUserDAO;
+
     public LDAPAuthenticationProvider()
     {
         // no arg consturctor
     }
 
-    public LDAPAuthenticationProvider(SystemCredentialsDAO systemCredentialsDAO)
+    public LDAPAuthenticationProvider(LDAPUserDAO ldapUserDAO)
     {
-        this.systemCredentialsDAO = systemCredentialsDAO;
+        this.ldapUserDAO = ldapUserDAO;
     }
 
     /*
@@ -42,25 +45,47 @@ public class LDAPAuthenticationProvider implements AuthenticationProvider
     {
 
         UsernamePasswordAuthenticationToken auth = (UsernamePasswordAuthenticationToken) authentication;
-        String userToken = String.valueOf(auth.getPrincipal());
+        String userName = String.valueOf(auth.getPrincipal());
+        String userPassword = String.valueOf(auth.getCredentials());
 
-        if (isBlank(userToken))
+        if (isBlank(userName))
         {
-            throw new BadCredentialsException("API token not provided.");
+            throw new BadCredentialsException("Username not provided.");
         }
 
-        SystemCredentials systemCredential = systemCredentialsDAO.getSystemCredentialsByToken(userToken);
-        if (systemCredential == null)
+        if (isBlank(userPassword))
         {
-            throw new BadCredentialsException("Invalid API token provided.");
+            throw new BadCredentialsException("Password not provided.");
         }
 
-        APIUser apiUser = new APIUser(systemCredential);
+        UserDTO authenticatedUserDTO = ldapUserDAO.getUserForAuthentication(userName,
+                preparePasswordForRequest(userPassword));
+        if (authenticatedUserDTO == null)
+        {
+            throw new BadCredentialsException("Invalid credentials provided.");
+        }
+
+        APIUser apiUser = new APIUser(authenticatedUserDTO);
 
         UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(
                 apiUser, null, apiUser.getAuthorities());
 
         return usernamePasswordAuthenticationToken;
+    }
+
+    /**
+     * Hash password based ont he default hashing algorithm used in all passwords that exist in the LDAP.
+     * @param userPassword
+     * @return hashed password prepended with algorithm name.
+     */
+    private String preparePasswordForRequest(String userPassword)
+    {
+        byte[] hashedPassword = PasswordUtil.encryptPassword(userPassword.getBytes(),
+                LdapSecurityConstants.HASH_METHOD_SHA, null);
+        String saltedPassword = new String(Base64.encodeBase64(hashedPassword));
+        saltedPassword = "{" + LdapSecurityConstants.HASH_METHOD_SHA.getPrefix() + "}" + saltedPassword;
+
+        return saltedPassword;
     }
 
     /*

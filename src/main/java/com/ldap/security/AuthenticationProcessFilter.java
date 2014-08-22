@@ -31,7 +31,8 @@ public class AuthenticationProcessFilter extends UsernamePasswordAuthenticationF
     @Autowired
     private LDAPAuthenticationProvider ldapAuthentication;
 
-    public static String TOKEN_PARAMETER = "authToken";
+    public static String USERNAME_PARAMETER = "username";
+    public static String PASSWORD_PARAMETER = "password";
 
     public AuthenticationProcessFilter()
     {
@@ -93,16 +94,14 @@ public class AuthenticationProcessFilter extends UsernamePasswordAuthenticationF
     }
 
     /**
-     * Implementation for fetching the token from the request header.
-     * 
-     * @param HTTP Servlet request used to retrieve the token
+     * Extract username value from Request Header params
      */
-    protected String obtainToken(HttpServletRequest request)
+    protected String obtainUsername(HttpServletRequest request)
     {
         String token = null;
 
         @SuppressWarnings("unchecked")
-        Enumeration<String> tokenHeader = request.getHeaders(TOKEN_PARAMETER);
+        Enumeration<String> tokenHeader = request.getHeaders(USERNAME_PARAMETER);
         if (tokenHeader.hasMoreElements())
         {
             token = tokenHeader.nextElement();
@@ -110,6 +109,22 @@ public class AuthenticationProcessFilter extends UsernamePasswordAuthenticationF
         return token;
     }
 
+    /**
+     * Extract password value from Request header params
+     */
+    protected String obtainPassword(HttpServletRequest request)
+    {
+        String token = null;
+
+        @SuppressWarnings("unchecked")
+        Enumeration<String> tokenHeader = request.getHeaders(PASSWORD_PARAMETER);
+        if (tokenHeader.hasMoreElements())
+        {
+            token = tokenHeader.nextElement();
+        }
+        return token;
+    }
+    
     /*
      * (non-Javadoc)
      * 
@@ -130,16 +145,10 @@ public class AuthenticationProcessFilter extends UsernamePasswordAuthenticationF
     public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response)
             throws AuthenticationException
     {
-        String token = obtainToken(request);
+        String userName = obtainUsername(request);
+        String password = obtainPassword(request);
 
-        if (isBlank(token))
-        {
-            token = "";
-        }
-
-        token = token.trim();
-
-        UsernamePasswordAuthenticationToken authRequest = new UsernamePasswordAuthenticationToken(token, null);
+        UsernamePasswordAuthenticationToken authRequest = new UsernamePasswordAuthenticationToken(userName, password);
 
         setDetails(request, authRequest);
 

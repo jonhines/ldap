@@ -15,12 +15,6 @@
 			/WEB-INF/ldap-context.xml
 		</param-value>
 	</context-param>
-
-	<!-- All exception mappers should be added here -->
-<!-- 	<context-param>
-		<param-name>resteasy.providers</param-name>
-		<param-value>com.wellogic.drugs.resteasy.DrugSearchBusinessServiceExceptionMapper, com.wellogic.drugs.resteasy.RuntimeExceptionMapper</param-value>
-	</context-param> -->
 		
 	<filter>
 		<filter-name>springSecurityFilterChain</filter-name>

@@ -13,6 +13,7 @@
 		<resteasy-version>2.3.5.Final</resteasy-version>
 		<hibernate.version>4.1.1.Final</hibernate.version>
 		<local.tomcat.port>8091</local.tomcat.port>
+		<apache.ds.version>2.0.0-M17</apache.ds.version>
 	</properties>
 
 	<repositories>
@@ -22,7 +23,7 @@
 			<url>https://repository.jboss.org/nexus/content/groups/public-jboss/</url>
 		</repository>
 	</repositories>
-	
+
 	<build>
 		<finalName>jon-ldap-${project.version}</finalName>
 		<sourceDirectory>src/main/java</sourceDirectory>
@@ -61,7 +62,7 @@
 					</webResources>
 				</configuration>
 			</plugin>
-			
+
 
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
@@ -112,14 +113,8 @@
 					</dependency>
 				</dependencies>
 				<executions>
-					<!-- 
-					<execution>
-						<id>tomcat-run</id>
-						<goals>
-							<goal>run-war-only</goal>
-						</goals>
-						<phase>package</phase>
-					</execution>  -->
+					<!-- <execution> <id>tomcat-run</id> <goals> <goal>run-war-only</goal> 
+						</goals> <phase>package</phase> </execution> -->
 					<execution>
 						<id>start-tomcat</id>
 						<phase>pre-integration-test</phase>
@@ -234,6 +229,12 @@
 			<artifactId>spring-web</artifactId>
 			<version>${spring.version}</version>
 		</dependency>
+		<!-- for OAuth 2.0 -->
+		<dependency>
+			<groupId>org.springframework.security.oauth</groupId>
+			<artifactId>spring-security-oauth2</artifactId>
+			<version>2.0.1.RELEASE</version>
+		</dependency>
 		<!-- end security dependencies -->
 
 		<!-- Resteasy Dependencies -->
@@ -263,6 +264,13 @@
 			<version>${resteasy-version}</version>
 		</dependency>
 		<!-- end Resteasy Dependencies -->
+
+		<!-- ApacheDS (LDAP) plugin -->
+		<dependency>
+			<groupId>org.apache.directory.server</groupId>
+			<artifactId>apacheds-all</artifactId>
+			<version>${apache.ds.version}</version>
+		</dependency>
 
 		<!-- logging -->
 		<dependency>
@@ -351,5 +359,6 @@
 			<version>1.3.RC2</version>
 			<scope>test</scope>
 		</dependency>
+
 	</dependencies>
 </project>
